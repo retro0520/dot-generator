@@ -118,7 +118,7 @@ export default function App() {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!prompt.trim()) {
       showToast('Please enter a prompt first!', 'error');
       return;
@@ -132,21 +132,35 @@ export default function App() {
 
     setIsGenerating(true);
     
-    // Simulate API delay for Replicate / Fal.ai model call
-    setTimeout(() => {
-      // Mock generated pixel art SVGs represented as Data URLs
-      const mockImages = [
-        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='256' height='256'><rect width='16' height='16' fill='%230f172a'/><path d='M4 4h8v2H4zM3 6h10v2H3zM2 8h12v4H2zM5 12h2v3H5zM9 12h2v3H9z' fill='%2310b981'/><rect x='5' y='7' width='2' height='2' fill='%23ffffff'/><rect x='9' y='7' width='2' height='2' fill='%23ffffff'/><rect x='6' y='8' width='1' height='1' fill='%23000000'/><rect x='10' y='8' width='1' height='1' fill='%23000000'/></svg>",
-        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='256' height='256'><rect width='16' height='16' fill='%231e1b4b'/><path d='M6 2h4v2H6zM4 4h8v3H4zM3 7h10v5H3zM4 12h3v3H4zM9 12h3v3H9z' fill='%23f59e0b'/><rect x='5' y='5' width='2' height='2' fill='%23ffffff'/><rect x='9' y='5' width='2' height='2' fill='%23ffffff'/><rect x='5' y='5' width='1' height='1' fill='%23000000'/><rect x='9' y='5' width='1' height='1' fill='%23000000'/></svg>",
-        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='256' height='256'><rect width='16' height='16' fill='%230284c7'/><path d='M5 3h6v3H5zM3 6h10v4H3zM2 10h12v3H2zM4 13h2v2H4zM10 13h2v2h-2z' fill='%23ec4899'/><rect x='5' y='7' width='2' height='2' fill='%2338bdf8'/><rect x='9' y='7' width='2' height='2' fill='%2338bdf8'/></svg>"
-      ];
-      
-      const randomImage = mockImages[Math.floor(Math.random() * mockImages.length)];
-      setCurrentImage(randomImage);
+    try {
+      // サーバーサイドのReplicate APIルートを呼び出す
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          size: selectedSize,
+          style: selectedStyle,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to generate image');
+      }
+
+      setCurrentImage(data.imageUrl);
       setTokens(prev => prev - 1);
+      showToast('Pixel art generated successfully! 1 Token used.', 'success');
+    } catch (error) {
+      console.error('Generation Error:', error);
+      showToast(`Error: ${error.message}`, 'error');
+    } finally {
       setIsGenerating(false);
-      showToast('Pixel art generated! 1 Token used.', 'success');
-    }, 2000);
+    }
   };
 
   const handleBuyTokens = () => {
