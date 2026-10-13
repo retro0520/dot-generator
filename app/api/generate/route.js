@@ -11,7 +11,7 @@ export async function POST(request) {
 
     // Replicateのドット絵生成モデルを呼び出し
     const output = await replicate.run(
-      "lucataco/pixel-art-xl:50a996b8641a995e929f07a7183e8fa2990d0b2e", 
+      "fofr/sdxl-pixel-art:d70b72a0d92233f06fcbe5fc9cfdd348827fa6d7a5b3a4a7541d441113e3b3e6", 
       {
         input: {
           prompt: `${prompt}, pixel art style, ${style}`,
