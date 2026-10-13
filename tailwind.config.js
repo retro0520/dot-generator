@@ -4,7 +4,13 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        cyberPink: '#ff007f',
+        cyberCyan: '#00ffcc',
+        cyberDark: '#090514',
+      },
+    },
   },
   plugins: [],
 }
