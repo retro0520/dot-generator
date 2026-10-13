@@ -9,21 +9,24 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    // Replicate公式の安定したStable Diffusionモデルを使用
+    // 画面で選ばれたサイズ（32, 64, 128など）を数値に変換
+    // ※SDXLは小さすぎる解像度が苦手なため、比率を保つか標準サイズにしつつ、
+    //   プロンプトやアスペクト比でドット絵感を調整します
+    const dimension = Number(size) >= 64 ? 1024 : 512;
+
     const output = await replicate.run(
       "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `${prompt}, pixel art style, ${style}, 8-bit, 16-bit, retro game graphics, detailed pixelated art`,
-          negative_prompt: "photorealistic, 3d render, blurry, smooth, gradient, realistic photo",
-          width: 1024,
-          height: 1024,
+          prompt: `cute ${prompt}, pixel art style, ${style}, retro 8-bit game sprite, vibrant colors, clean pixels, masterpiece`,
+          negative_prompt: "scary, creepy, realistic, photorealistic, 3d render, blurry, smooth, gradient, ugly",
+          width: dimension,
+          height: dimension,
           num_outputs: 1,
         }
       }
     );
 
-    // 生成された画像のURLを取得
     const imageUrl = Array.isArray(output) ? output[0] : output;
 
     return NextResponse.json({ success: true, imageUrl });
