@@ -7,26 +7,16 @@ const replicate = new Replicate({
 
 export async function POST(request) {
   try {
-    const { prompt, size, style } = await request.json();
+    const { prompt, style } = await request.json();
 
-    // 画面で選ばれたサイズに応じた解像度設定（SDXLが破綻しない最低限のサイズを維持しつつ調整）
-    const dimMap = {
-      '16': 512,
-      '32': 512,
-      '64': 1024,
-      '128': 1024,
-    };
-    const dimension = dimMap[size] || 512;
-
+    // ドット絵専用モデル (nerijs/pixel-art-xl)
     const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      "nerijs/pixel-art-xl:7374d9e06551e8271863f19d59072a420724016b9d5616528d656f707a22e400",
       {
         input: {
-          prompt: `cute ${prompt}, pixel art style, ${style}, retro 8-bit NES game sprite, single character, solid white background, flat background, no complex background, game asset`,
-          negative_prompt: "complex background, scenery, realistic, photorealistic, 3d render, blurry, smooth, gradient, ugly, scary, creepy",
-          width: dimension,
-          height: dimension,
-          num_outputs: 1,
+          prompt: `pixel art, ${prompt}, ${style}, retro game sprite, centered, isolated on solid plain white background`,
+          negative_prompt: "background elements, scenery, frame, border, text, watermark, 3d, photorealistic, blurry, noise, gradient",
+          number_of_images: 1,
         }
       }
     );
