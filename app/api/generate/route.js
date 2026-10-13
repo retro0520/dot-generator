@@ -10,7 +10,6 @@ export async function POST(request) {
     const { prompt, size, style } = await request.json();
 
     // Replicateのドット絵生成モデルを呼び出し
-    // (例としてピクセルアートに特化した安定したモデルを指定)
     const output = await replicate.run(
       "lucataco/pixel-art-xl:50a996b8641a995e929f07a7183e8fa2990d0b2e", 
       {
@@ -23,7 +22,7 @@ export async function POST(request) {
       }
     );
 
-    // 生成された画像のURLを返す
+    // 生成された画像のURLを取得
     const imageUrl = Array.isArray(output) ? output[0] : output;
 
     return NextResponse.json({ success: true, imageUrl });
