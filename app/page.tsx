@@ -34,6 +34,7 @@ const STYLE_OPTIONS = [
 ];
 
 const CANVAS_SIZES = [
+  { id: '16', label: '16 x 16', badge: 'Retro 8-bit' },
   { id: '32', label: '32 x 32', badge: 'Fast' },
   { id: '64', label: '64 x 64', badge: 'Standard' },
   { id: '128', label: '128 x 128', badge: 'HD Pixel' },
