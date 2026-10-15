@@ -9,8 +9,7 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    // 選択されたサイズ（16x16, 32x32など）に応じて出力サイズを綺麗に調整
-    // ※AIモデルが破綻しない最小ピクセルサイズ（512pxなど）をベースにしつつ、ドット感を出します
+    // 選択された解像度（size）に応じて出力サイズを制御
     const dimMap = {
       '16': 512,
       '32': 512,
@@ -19,13 +18,13 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
-    // 安定稼働しているモデルを使用し、グリッド線や余計な枠が入らない洗練されたプロンプトを指定
+    // ドット絵特化のLoRA/専用モデルの実行設定
     const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      "lucataco/pixel-art-xl:b433e072f10d6e19cd914a51ebc5cddf571b058a9e0839e5e6e39257e84cc240",
       {
         input: {
-          prompt: `retro 8-bit pixel art of ${prompt}, style: ${style}, single game sprite character, sharp edges, clean pixels, centered, solid white background, no grid lines, no UI frame`,
-          negative_prompt: "blurry, grid lines, graph paper, blueprint, frame, border, photorealistic, 3d render, complex background, scenery, text, watermark",
+          prompt: `pixel art, single game sprite of ${prompt}, ${style}, retro 8-bit character, sharp pixelated edges, centered, isolated on solid plain white background, flat color`,
+          negative_prompt: "blurry, smooth gradients, anti-aliasing, photorealistic, 3d render, complex background, scenery, multiple characters, double, split screen, grid lines, frame, border, text, watermark",
           width: dimension,
           height: dimension,
           num_outputs: 1,
