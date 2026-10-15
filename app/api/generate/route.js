@@ -9,10 +9,10 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    // 16x16選択時は解像度を思い切り小さくし、大きなドットの塊を強制します
+    // 誤検知を防ぎつつ安定動作する512pxをベースにします
     const dimMap = {
-      '16': 256,
-      '32': 256,
+      '16': 512,
+      '32': 512,
       '64': 512,
       '128': 1024,
     };
@@ -22,11 +22,11 @@ export async function POST(request) {
       "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `16-bit retro video game sprite of ${prompt}, style: ${style}, low resolution pixel art, chunky pixels, sharp hard edges, solid white background, flat color, no gradients`,
-          negative_prompt: "high resolution, smooth gradients, anti-aliasing, modern digital art, 3d render, photorealistic, blurry, sprite sheet, multiple characters, complex background, grid lines, frame, border",
+          prompt: `safe clean retro 8-bit video game sprite of ${prompt}, style: ${style}, chunky pixel art, hard edges, solid white background, flat color, no gradients`,
+          negative_prompt: "nsfw, nude, sexual, high resolution, smooth gradients, anti-aliasing, modern digital art, 3d render, photorealistic, blurry, sprite sheet, multiple characters, complex background, grid lines, frame, border",
           width: dimension,
           height: dimension,
-          guidance_scale: 8.0,
+          guidance_scale: 7.0,
           num_outputs: 1,
         }
       }
