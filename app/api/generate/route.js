@@ -17,13 +17,12 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
-    // バージョン切れが絶対に起きない公式の安定版モデルを使用し、プロンプトでピクセルアートを完全に制御します
     const output = await replicate.run(
       "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `pixel art, single retro 8-bit video game character sprite of ${prompt}, style: ${style}, sharp edges, solid white background, flat color, game asset`,
-          negative_prompt: "blurry, smooth, gradient, 3d render, photorealistic, complex background, scenery, multiple characters, grid lines, frame, border",
+          prompt: `pixel art, retro 8-bit game sprite of a single ${prompt}, style: ${style}, sharp pixel edges, pure solid white background, flat color, no background noise, game asset`,
+          negative_prompt: "noise, dithering, gradient background, blurry, smooth, 3d render, photorealistic, complex background, scenery, multiple characters, grid lines, frame, border",
           width: dimension,
           height: dimension,
           num_outputs: 1,
