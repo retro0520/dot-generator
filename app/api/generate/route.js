@@ -9,24 +9,18 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    // ドット絵専用モデルの仕様に合わせて解像度を最適化
-    const dimMap = {
-      '16': 512,
-      '32': 512,
-      '64': 512,
-      '128': 1024,
-    };
-    const dimension = dimMap[size] || 512;
+    // 選択された解像度（16, 32など）をそのままピクセルサイズとして指定
+    const pixelSize = parseInt(size, 10) || 16;
 
-    // ドット絵・ゲームスプライト専用に開発された安定版モデルを使用
+    // 本物のドット絵・ゲームスプライト専用モデル（Retro Diffusion RD Plus）を使用
     const output = await replicate.run(
-      "retro-diffusion/rd-plus:latest",
+      "retro-diffusion/rd-plus",
       {
         input: {
-          prompt: `retro 8-bit game sprite of ${prompt}, ${style}, clean pixel art, grid-aligned, solid white background`,
+          prompt: `retro 8-bit NES game character sprite of ${prompt}, style: ${style}, clean pixel art, grid-aligned, solid white background`,
           negative_prompt: "blurry, smooth, gradient, photorealistic, 3d render, complex background",
-          width: dimension,
-          height: dimension,
+          width: pixelSize <= 16 ? 256 : pixelSize <= 32 ? 512 : 512,
+          height: pixelSize <= 16 ? 256 : pixelSize <= 32 ? 512 : 512,
         }
       }
     );
