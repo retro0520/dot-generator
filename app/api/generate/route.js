@@ -7,16 +7,26 @@ const replicate = new Replicate({
 
 export async function POST(request) {
   try {
-    const { prompt, style } = await request.json();
+    const { prompt, size, style } = await request.json();
 
-    // ドット絵専用モデル (nerijs/pixel-art-xl)
+    const dimMap = {
+      '16': 512,
+      '32': 512,
+      '64': 1024,
+      '128': 1024,
+    };
+    const dimension = dimMap[size] || 512;
+
+    // 安定して動作する代表的なドット絵生成モデルの最新バージョンIDを指定
     const output = await replicate.run(
-      "nerijs/pixel-art-xl:7374d9e06551e8271863f19d59072a420724016b9d5616528d656f707a22e400",
+      "lucataco/pixel-art-xl:b433e072f10d6e19cd914a51ebc5cddf571b058a9e0839e5e6e39257e84cc240",
       {
         input: {
-          prompt: `pixel art, ${prompt}, ${style}, retro game sprite, centered, isolated on solid plain white background`,
-          negative_prompt: "complex background, scenery, frame, border, text, watermark, 3d, photorealistic, blurry, noise, gradient",
-          number_of_images: 1,
+          prompt: `pixel art, ${prompt}, ${style}, retro game sprite, centered, isolated on solid white background`,
+          negative_prompt: "blurry, realistic, 3d, complex background, scenery, photorealistic",
+          width: dimension,
+          height: dimension,
+          num_outputs: 1,
         }
       }
     );
