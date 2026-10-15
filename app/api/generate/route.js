@@ -9,20 +9,23 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    const pixelSize = parseInt(size, 10) || 16;
+    // Retro Diffusionの制限（最大384以下）に合わせた解像度設定
+    const dimMap = {
+      '16': 256,
+      '32': 320,
+      '64': 384,
+      '128': 384,
+    };
+    const dimension = dimMap[size] || 256;
 
-    // Retro Diffusion専用のパラメータを付与し、3D感を完全に排除して強制的にドット絵化します
     const output = await replicate.run(
       "retro-diffusion/rd-plus",
       {
         input: {
-          prompt: `pixel art, 8-bit NES sprite of ${prompt}, style: ${style}, flat colors, sharp hard pixels, 2D game asset, solid white background`,
+          prompt: `pixel art, 8-bit NES retro game character sprite of ${prompt}, style: ${style}, flat colors, sharp hard pixels, 2D game asset, solid white background`,
           negative_prompt: "3d render, photorealistic, smooth, gradients, soft shading, blurry, modern art",
-          width: 512,
-          height: 512,
-          // モデル側でピクセル感を強めるための設定
-          upscale: false,
-          grid: true,
+          width: dimension,
+          height: dimension,
         }
       }
     );
