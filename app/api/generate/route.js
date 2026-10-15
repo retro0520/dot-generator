@@ -17,16 +17,15 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
-    // NSFW誤検知を避けつつ、ファミコン風のシンプルなドット絵を狙う安全なプロンプト設計
     const output = await replicate.run(
       "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `retro 8-bit NES style pixel art of ${prompt}, clean game character sprite, sharp pixels, solid white background, flat color, safe for work`,
-          negative_prompt: "blurry, smooth, gradient, 3d render, photorealistic, complex background, scenery, multiple characters, grid lines, frame, border, dark",
+          prompt: `single 8-bit retro game sprite of ${prompt}, style: ${style}, single centered character only, pure white background, flat color, pixel art`,
+          negative_prompt: "sprite sheet, multiple views, character turnaround, back view, extra parts, two characters, double, split screen, blurry, smooth, gradient, 3d render, photorealistic, complex background, scenery, grid lines, frame, border",
           width: dimension,
           height: dimension,
-          guidance_scale: 7.0,
+          guidance_scale: 7.5,
           num_outputs: 1,
         }
       }
