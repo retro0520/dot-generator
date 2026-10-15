@@ -9,7 +9,6 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    // 選択された解像度（size）に応じて出力サイズを制御
     const dimMap = {
       '16': 512,
       '32': 512,
@@ -18,13 +17,13 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
-    // ドット絵特化のLoRA/専用モデルの実行設定
+    // バージョン切れが絶対に起きない公式の安定版モデルを使用し、プロンプトでピクセルアートを完全に制御します
     const output = await replicate.run(
-      "lucataco/pixel-art-xl:b433e072f10d6e19cd914a51ebc5cddf571b058a9e0839e5e6e39257e84cc240",
+      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `pixel art, single game sprite of ${prompt}, ${style}, retro 8-bit character, sharp pixelated edges, centered, isolated on solid plain white background, flat color`,
-          negative_prompt: "blurry, smooth gradients, anti-aliasing, photorealistic, 3d render, complex background, scenery, multiple characters, double, split screen, grid lines, frame, border, text, watermark",
+          prompt: `pixel art, single retro 8-bit video game character sprite of ${prompt}, style: ${style}, sharp edges, solid white background, flat color, game asset`,
+          negative_prompt: "blurry, smooth, gradient, 3d render, photorealistic, complex background, scenery, multiple characters, grid lines, frame, border",
           width: dimension,
           height: dimension,
           num_outputs: 1,
