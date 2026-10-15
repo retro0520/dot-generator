@@ -7,16 +7,26 @@ const replicate = new Replicate({
 
 export async function POST(request) {
   try {
-    const { prompt, style } = await request.json();
+    const { prompt, size, style } = await request.json();
 
-    // ドット絵専用モデル (nerijs/pixel-art-xl)
+    const dimMap = {
+      '16': 512,
+      '32': 512,
+      '64': 1024,
+      '128': 1024,
+    };
+    const dimension = dimMap[size] || 512;
+
+    // 公式モデルを「stability-ai/sdxl」の形式で指定し、バージョン切れエラーを完全に防止する
     const output = await replicate.run(
-      "nerijs/pixel-art-xl:7374d9e06551e8271863f19d59072a420724016b9d5616528d656f707a22e400",
+      "stability-ai/sdxl",
       {
         input: {
-          prompt: `pixel art, ${prompt}, ${style}, retro game sprite, centered, isolated on solid plain white background`,
-          negative_prompt: "background elements, scenery, frame, border, text, watermark, 3d, photorealistic, blurry, noise, gradient",
-          number_of_images: 1,
+          prompt: `retro 8-bit pixel art of ${prompt}, ${style}, single video game character sprite, crisp pixels, centered, isolated on solid white background, flat background`,
+          negative_prompt: "complex background, scenery, map, UI, frame, border, 3d render, photorealistic, blurry, smooth, gradient, realistic photo",
+          width: dimension,
+          height: dimension,
+          num_outputs: 1,
         }
       }
     );
