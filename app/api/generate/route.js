@@ -9,21 +9,23 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
+    // 選択されたサイズ（16x16, 32x32など）に応じて出力サイズを綺麗に調整
+    // ※AIモデルが破綻しない最小ピクセルサイズ（512pxなど）をベースにしつつ、ドット感を出します
     const dimMap = {
       '16': 512,
       '32': 512,
-      '64': 1024,
+      '64': 512,
       '128': 1024,
     };
     const dimension = dimMap[size] || 512;
 
-    // 現在確実に稼働が保証されている安定版のハッシュを使用
+    // 安定稼働しているモデルを使用し、グリッド線や余計な枠が入らない洗練されたプロンプトを指定
     const output = await replicate.run(
       "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `pixel art, ${prompt}, ${style}, retro 8-bit game character, solid white background`,
-          negative_prompt: "blurry, realistic, 3d, complex background",
+          prompt: `retro 8-bit pixel art of ${prompt}, style: ${style}, single game sprite character, sharp edges, clean pixels, centered, solid white background, no grid lines, no UI frame`,
+          negative_prompt: "blurry, grid lines, graph paper, blueprint, frame, border, photorealistic, 3d render, complex background, scenery, text, watermark",
           width: dimension,
           height: dimension,
           num_outputs: 1,
