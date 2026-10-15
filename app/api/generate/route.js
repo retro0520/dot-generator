@@ -9,7 +9,6 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
-    // 誤検知を防ぎつつ安定動作する512pxをベースにします
     const dimMap = {
       '16': 512,
       '32': 512,
@@ -18,15 +17,15 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
+    // SDXLではなく、本物のドット絵特化型モデル（Latent Consistency Pixel Art）に切り替え
     const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      "fofr/latent-consistency-model-pixel-art:94d137bc449339a04a60f9eb1453aa0d93540b9550b0f796cc9a1f2b6e174780",
       {
         input: {
-          prompt: `safe clean retro 8-bit video game sprite of ${prompt}, style: ${style}, chunky pixel art, hard edges, solid white background, flat color, no gradients`,
-          negative_prompt: "nsfw, nude, sexual, high resolution, smooth gradients, anti-aliasing, modern digital art, 3d render, photorealistic, blurry, sprite sheet, multiple characters, complex background, grid lines, frame, border",
+          prompt: `pixel art style, 8-bit NES game sprite of ${prompt}, ${style}, sharp chunky pixels, solid white background, flat colors, limited color palette`,
+          negative_prompt: "smooth gradients, anti-aliasing, blurry, high resolution, 3d render, photorealistic, complex background, multiple characters, grid lines",
           width: dimension,
           height: dimension,
-          guidance_scale: 7.0,
           num_outputs: 1,
         }
       }
