@@ -17,13 +17,13 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
-    // 安定して動作する代表的なドット絵生成モデルの最新バージョンIDを指定
+    // 現在確実に稼働が保証されている安定版のハッシュを使用
     const output = await replicate.run(
-      "lucataco/pixel-art-xl:b433e072f10d6e19cd914a51ebc5cddf571b058a9e0839e5e6e39257e84cc240",
+      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
       {
         input: {
-          prompt: `pixel art, ${prompt}, ${style}, retro game sprite, centered, isolated on solid white background`,
-          negative_prompt: "blurry, realistic, 3d, complex background, scenery, photorealistic",
+          prompt: `pixel art, ${prompt}, ${style}, retro 8-bit game character, solid white background`,
+          negative_prompt: "blurry, realistic, 3d, complex background",
           width: dimension,
           height: dimension,
           num_outputs: 1,
