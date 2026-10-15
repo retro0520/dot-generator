@@ -9,6 +9,7 @@ export async function POST(request) {
   try {
     const { prompt, size, style } = await request.json();
 
+    // ドット絵専用モデルの仕様に合わせて解像度を最適化
     const dimMap = {
       '16': 512,
       '32': 512,
@@ -17,17 +18,15 @@ export async function POST(request) {
     };
     const dimension = dimMap[size] || 512;
 
-    // バージョン切れの起きない公式SDXLを使用し、プロンプトの力だけで限界までレトロなドット絵に落とし込みます
+    // ドット絵・ゲームスプライト専用に開発された安定版モデルを使用
     const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      "retro-diffusion/rd-plus:latest",
       {
         input: {
-          prompt: `raw 8-bit NES video game sprite of ${prompt}, style: ${style}, chunky pixel art, blocky pixels, harsh edges, limited 4-color palette, solid white background, flat color, no smooth lines, no shading`,
-          negative_prompt: "smooth lines, vector art, high resolution, soft shading, gradients, anti-aliasing, modern digital art, 3d render, photorealistic, blurry, sprite sheet, multiple characters, complex background, grid lines, frame, border",
+          prompt: `retro 8-bit game sprite of ${prompt}, ${style}, clean pixel art, grid-aligned, solid white background`,
+          negative_prompt: "blurry, smooth, gradient, photorealistic, 3d render, complex background",
           width: dimension,
           height: dimension,
-          guidance_scale: 8.5,
-          num_outputs: 1,
         }
       }
     );
